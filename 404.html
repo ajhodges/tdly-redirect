@@ -5,8 +5,9 @@
     <meta charset="utf-8">
     <title>Redirecting...</title>
     <script>
-        // Store the URL we want to redirect to
-        sessionStorage.redirect = location.pathname + location.search;
+                // Store the URL we want to redirect to, including query parameters
+                const redirectPath = location.pathname.replace('/tdly-redirect', '') + location.search;
+                sessionStorage.redirect = redirectPath;
         // Redirect to index.html
         location.replace('/tdly-redirect/');
     </script>
