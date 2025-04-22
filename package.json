@@ -2,7 +2,7 @@
   "name": "tdly-redirect",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://ajhodges.github.io/tdly-redirect/",
+  "homepage": "https://ajhodges.github.io/tdly-redirect",
   "dependencies": {
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^5.17.0",

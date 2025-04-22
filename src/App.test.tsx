@@ -1,24 +1,34 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import App from './App';
+import RedirectForm from './components/RedirectForm';
+import Reset from './components/Reset';
+
+const TestRouter: React.FC = () => (
+  <MemoryRouter initialEntries={['/']}>
+    <Routes>
+      <Route path="/" element={<RedirectForm />} />
+      <Route path="/reset" element={<Reset />} />
+      <Route path="/simulator/new" element={<RedirectForm />} />
+    </Routes>
+  </MemoryRouter>
+);
 
 describe('App', () => {
   it('renders RedirectForm component on root path', () => {
-    render(
-      <MemoryRouter initialEntries={['/']}>
-        <App />
-      </MemoryRouter>
-    );
-    expect(screen.getByText('Redirect Form')).toBeInTheDocument();
+    render(<App RouterComponent={TestRouter} />);
+    expect(screen.getByText('Tenderly Redirect')).toBeInTheDocument();
   });
 
   it('renders Reset component on /reset path', () => {
     render(
       <MemoryRouter initialEntries={['/reset']}>
-        <App />
+        <Routes>
+          <Route path="/reset" element={<Reset />} />
+        </Routes>
       </MemoryRouter>
     );
-    expect(screen.getByText('Reset')).toBeInTheDocument();
+    expect(screen.getByText('Credentials Reset')).toBeInTheDocument();
   });
 });

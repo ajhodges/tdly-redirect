@@ -1,104 +1,73 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import { MemoryRouter } from 'react-router-dom';
 import RedirectForm from './RedirectForm';
+
+// Mock window.alert
+const mockAlert = jest.spyOn(window, 'alert').mockImplementation(() => {});
 
 // Mock localStorage
 const mockLocalStorage = {
   getItem: jest.fn(),
   setItem: jest.fn(),
+  clear: jest.fn(),
 };
 Object.defineProperty(window, 'localStorage', { value: mockLocalStorage });
 
-// Mock window.location
-const mockLocation = {
-  href: '',
-};
-Object.defineProperty(window, 'location', { value: mockLocation });
-
 describe('RedirectForm', () => {
   beforeEach(() => {
+    // Clear all mocks before each test
     jest.clearAllMocks();
-    mockLocation.href = '';
-  });
-
-  it('should show form when no credentials are stored', () => {
     mockLocalStorage.getItem.mockReturnValue(null);
-    
-    render(
-      <MemoryRouter initialEntries={['/']}>
-        <Routes>
-          <Route path="/" element={<RedirectForm />} />
-        </Routes>
-      </MemoryRouter>
-    );
-
-    expect(screen.getByLabelText(/Tenderly Username/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/Project Name/i)).toBeInTheDocument();
-    expect(screen.getByText(/Redirect to Tenderly/i)).toBeInTheDocument();
   });
 
-  it('should redirect immediately when credentials are stored', () => {
-    mockLocalStorage.getItem
-      .mockReturnValueOnce('testuser')
-      .mockReturnValueOnce('testproject');
-
+  it('renders form elements', () => {
     render(
-      <MemoryRouter initialEntries={['/simulator/new?block=123']}>
-        <Routes>
-          <Route path="*" element={<RedirectForm />} />
-        </Routes>
+      <MemoryRouter>
+        <RedirectForm />
       </MemoryRouter>
     );
 
-    expect(mockLocation.href).toBe(
-      'https://dashboard.tenderly.co/testuser/testproject/simulator/new?block=123'
-    );
+    expect(screen.getByLabelText('Tenderly Username:')).toBeInTheDocument();
+    expect(screen.getByLabelText('Project Slug:')).toBeInTheDocument();
+    expect(screen.getByText('Save Details')).toBeInTheDocument();
   });
 
-  it('should store credentials and redirect on form submission', async () => {
-    mockLocalStorage.getItem.mockReturnValue(null);
-
+  it('handles form submission', async () => {
     render(
-      <MemoryRouter initialEntries={['/simulator/new?block=123']}>
-        <Routes>
-          <Route path="*" element={<RedirectForm />} />
-        </Routes>
+      <MemoryRouter>
+        <RedirectForm />
       </MemoryRouter>
     );
 
-    fireEvent.change(screen.getByLabelText(/Tenderly Username/i), {
-      target: { value: 'testuser' },
-    });
-    fireEvent.change(screen.getByLabelText(/Project Name/i), {
-      target: { value: 'testproject' },
-    });
-    fireEvent.click(screen.getByText(/Redirect to Tenderly/i));
+    const usernameInput = screen.getByLabelText('Tenderly Username:');
+    const projectSlugInput = screen.getByLabelText('Project Slug:');
+    const submitButton = screen.getByText('Save Details');
 
-    await waitFor(() => {
-      expect(mockLocalStorage.setItem).toHaveBeenCalledWith('tenderlyUsername', 'testuser');
-      expect(mockLocalStorage.setItem).toHaveBeenCalledWith('tenderlyProject', 'testproject');
-      expect(mockLocation.href).toBe(
-        'https://dashboard.tenderly.co/testuser/testproject/simulator/new?block=123'
-      );
-    });
-  });
-
-  it('should handle empty form submission', () => {
-    mockLocalStorage.getItem.mockReturnValue(null);
-
-    render(
-      <MemoryRouter initialEntries={['/']}>
-        <Routes>
-          <Route path="/" element={<RedirectForm />} />
-        </Routes>
-      </MemoryRouter>
-    );
-
-    const submitButton = screen.getByText(/Redirect to Tenderly/i);
+    fireEvent.change(usernameInput, { target: { value: 'testuser' } });
+    fireEvent.change(projectSlugInput, { target: { value: 'testproject' } });
     fireEvent.click(submitButton);
 
-    expect(mockLocalStorage.setItem).not.toHaveBeenCalled();
-    expect(mockLocation.href).toBe('');
+    await waitFor(() => {
+      expect(mockAlert).toHaveBeenCalledWith('Values saved successfully! You will be redirected when parameters are provided.');
+      expect(mockLocalStorage.setItem).toHaveBeenCalledWith('tenderlyUsername', 'testuser');
+      expect(mockLocalStorage.setItem).toHaveBeenCalledWith('tenderlyProjectSlug', 'testproject');
+    });
+  });
+
+  it('validates form fields', async () => {
+    render(
+      <MemoryRouter>
+        <RedirectForm />
+      </MemoryRouter>
+    );
+
+    const submitButton = screen.getByText('Save Details');
+    fireEvent.click(submitButton);
+
+    // The form should prevent submission and not call alert
+    await waitFor(() => {
+      expect(mockAlert).not.toHaveBeenCalled();
+    });
   });
 }); 

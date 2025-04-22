@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
 const RedirectForm: React.FC = () => {
+  const [searchParams] = useSearchParams();
   const [username, setUsername] = useState('');
   const [projectSlug, setProjectSlug] = useState('');
-  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -101,13 +101,13 @@ const RedirectForm: React.FC = () => {
             placeholder="Enter your project slug"
           />
         </div>
-        <button 
+        <button
           type="submit"
-          style={{ 
+          style={{
             padding: '12px', 
-            backgroundColor: '#4CAF50', 
-            color: 'white', 
-            border: 'none', 
+            backgroundColor: '#4CAF50',
+            color: 'white',
+            border: 'none',
             borderRadius: '4px',
             cursor: 'pointer',
             fontSize: '16px',
