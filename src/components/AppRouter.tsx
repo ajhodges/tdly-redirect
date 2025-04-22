@@ -23,7 +23,7 @@ const RedirectHandler = () => {
 
 const AppRouter: React.FC = () => {
   return (
-    <BrowserRouter basename="/tdly-redirect">
+    <BrowserRouter>
       <RedirectHandler />
       <Routes>
         <Route path="/" element={<RedirectForm />} />
