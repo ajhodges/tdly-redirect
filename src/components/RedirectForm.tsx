@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 
 const RedirectForm: React.FC = () => {
   const [searchParams] = useSearchParams();
+  const location = useLocation();
   const [username, setUsername] = useState('');
   const [projectSlug, setProjectSlug] = useState('');
   const navigate = useNavigate();
@@ -11,9 +12,16 @@ const RedirectForm: React.FC = () => {
     // Set document title
     document.title = 'Redirecting to Tenderly...';
 
-    // Check if we have stored values
+    // Load saved values from localStorage
     const storedUsername = localStorage.getItem('tenderlyUsername');
     const storedProjectSlug = localStorage.getItem('tenderlyProjectSlug');
+    
+    if (storedUsername) {
+      setUsername(storedUsername);
+    }
+    if (storedProjectSlug) {
+      setProjectSlug(storedProjectSlug);
+    }
     
     // Only redirect if we have both stored values AND search parameters
     if (storedUsername && storedProjectSlug && searchParams.toString()) {
