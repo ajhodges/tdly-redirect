@@ -13,8 +13,10 @@ const RedirectHandler = () => {
     if (redirect) {
       // Remove the stored redirect
       delete sessionStorage.redirect;
+      // Strip the base path from the redirect URL
+      const path = redirect.replace('/tdly-redirect', '');
       // Navigate to the stored path
-      navigate(redirect);
+      navigate(path);
     }
   }, [navigate]);
 
@@ -23,12 +25,13 @@ const RedirectHandler = () => {
 
 const AppRouter: React.FC = () => {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename="/tdly-redirect">
       <RedirectHandler />
       <Routes>
         <Route path="/" element={<RedirectForm />} />
         <Route path="/reset" element={<Reset />} />
         <Route path="/simulator/new" element={<RedirectForm />} />
+        <Route path="*" element={<RedirectForm />} />
       </Routes>
     </BrowserRouter>
   );
