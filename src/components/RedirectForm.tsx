@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
+import pako from 'pako';
 
 const RedirectForm: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -7,6 +8,23 @@ const RedirectForm: React.FC = () => {
   const [username, setUsername] = useState('');
   const [projectSlug, setProjectSlug] = useState('');
   const navigate = useNavigate();
+
+  const getQueryString = () => {
+    // If 'q' parameter is present, decompress it
+    const compressedQuery = searchParams.get('q');
+    if (compressedQuery) {
+        // Decode base64url and decompress
+        const bytes = Buffer.from(compressedQuery, 'base64url');
+        const decompressed = pako.inflate(bytes);
+        const decompressedString = String.fromCharCode.apply(null, Array.from(decompressed));
+        console.log('Decompressed query string:', decompressedString);
+        return decompressedString;
+    }
+    // Otherwise use all parameters except 'q'
+    const params = new URLSearchParams(searchParams);
+    params.delete('q');
+    return params.toString();
+  };
 
   useEffect(() => {
     // Set document title
@@ -33,10 +51,11 @@ const RedirectForm: React.FC = () => {
       return;
     }
     
-    // Only redirect if we have both stored values AND search parameters
-    if (storedUsername && storedProjectSlug && searchParams.toString()) {
-      console.log('Found stored values and parameters:', { storedUsername, storedProjectSlug, params: searchParams.toString() });
-      const tenderlyUrl = `https://dashboard.tenderly.co/${storedUsername}/${storedProjectSlug}/simulator/new?${searchParams.toString()}`;
+    // Only redirect if we have both stored values AND query parameters
+    const queryString = getQueryString();
+    if (storedUsername && storedProjectSlug && queryString) {
+      console.log('Found stored values and parameters:', { storedUsername, storedProjectSlug, params: queryString });
+      const tenderlyUrl = `https://dashboard.tenderly.co/${storedUsername}/${storedProjectSlug}/simulator/new?${queryString}`;
       console.log('Redirecting to:', tenderlyUrl);
       window.location.href = tenderlyUrl;
     }
@@ -54,8 +73,9 @@ const RedirectForm: React.FC = () => {
     localStorage.setItem('tenderlyProjectSlug', projectSlug);
     
     // Only redirect if we have parameters
-    if (searchParams.toString()) {
-      const tenderlyUrl = `https://dashboard.tenderly.co/${username}/${projectSlug}/simulator/new?${searchParams.toString()}`;
+    const queryString = getQueryString();
+    if (queryString) {
+      const tenderlyUrl = `https://dashboard.tenderly.co/${username}/${projectSlug}/simulator/new?${queryString}`;
       window.location.href = tenderlyUrl;
     } else {
       // If no parameters, just show success message
