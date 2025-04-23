@@ -105,7 +105,6 @@ describe('RedirectForm', () => {
       return null;
     });
 
-    // URL decode the compressed query before passing it to URLSearchParams
     const mockSearchParams = new URLSearchParams(`q=${base64url}`);
     (useSearchParams as jest.Mock).mockReturnValue([mockSearchParams, jest.fn()]);
     (useLocation as jest.Mock).mockReturnValue({ 
@@ -121,10 +120,6 @@ describe('RedirectForm', () => {
       writable: true,
     });
 
-    // Mock console.error to prevent test output pollution
-    const originalConsoleError = console.error;
-    console.error = jest.fn();
-
     render(
       <MemoryRouter initialEntries={[`/?q=${base64url}`]}>
         <RedirectForm />
@@ -134,9 +129,6 @@ describe('RedirectForm', () => {
     await waitFor(() => {
       expect(mockWindowLocation.href).toBe('https://dashboard.tenderly.co/testuser/testproject/simulator/new?block=29286050&network=8453');
     });
-
-    // Restore mocks
-    console.error = originalConsoleError;
   });
 
   it('handles real compressed query parameters', async () => {
