@@ -23,6 +23,16 @@ const RedirectForm: React.FC = () => {
       setProjectSlug(storedProjectSlug);
     }
     
+    // Check if we're on the reset path
+    const path = searchParams.get('path');
+    if (path === '/reset') {
+      // Clear credentials and redirect to root without parameters
+      localStorage.removeItem('tenderlyUsername');
+      localStorage.removeItem('tenderlyProjectSlug');
+      navigate('/tdly-redirect');
+      return;
+    }
+    
     // Only redirect if we have both stored values AND search parameters
     if (storedUsername && storedProjectSlug && searchParams.toString()) {
       console.log('Found stored values and parameters:', { storedUsername, storedProjectSlug, params: searchParams.toString() });
@@ -30,7 +40,7 @@ const RedirectForm: React.FC = () => {
       console.log('Redirecting to:', tenderlyUrl);
       window.location.href = tenderlyUrl;
     }
-  }, [searchParams]);
+  }, [searchParams, navigate]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,6 +63,14 @@ const RedirectForm: React.FC = () => {
     }
   };
 
+  const handleClear = () => {
+    localStorage.removeItem('tenderlyUsername');
+    localStorage.removeItem('tenderlyProjectSlug');
+    setUsername('');
+    setProjectSlug('');
+    alert('Details cleared successfully!');
+  };
+
   return (
     <div style={{ 
       maxWidth: '500px', 
@@ -62,7 +80,7 @@ const RedirectForm: React.FC = () => {
     }}>
       <h1>Tenderly Redirect</h1>
       <p style={{ color: '#666', marginBottom: '20px' }}>
-        Enter your Tenderly account details below. You will be automatically redirected when parameters are provided.
+        Enter your Tenderly account details below. You should be automatically redirected when parameters are provided.
       </p>
       <div style={{ marginBottom: '20px', padding: '15px', backgroundColor: '#f8f9fa', borderRadius: '4px' }}>
         <p style={{ marginBottom: '10px' }}>Need help finding these values?</p>
@@ -109,24 +127,47 @@ const RedirectForm: React.FC = () => {
             placeholder="Enter your project slug"
           />
         </div>
-        <button
-          type="submit"
-          style={{
-            padding: '12px', 
-            backgroundColor: '#4CAF50',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: 'pointer',
-            fontSize: '16px',
-            fontWeight: 'bold',
-            transition: 'background-color 0.3s'
-          }}
-          onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#45a049'}
-          onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#4CAF50'}
-        >
-          Save Details
-        </button>
+        <div style={{ display: 'flex', gap: '10px' }}>
+          <button
+            type="submit"
+            style={{
+              flex: 1,
+              padding: '12px', 
+              backgroundColor: '#4CAF50',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontSize: '16px',
+              fontWeight: 'bold',
+              transition: 'background-color 0.3s'
+            }}
+            onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#45a049'}
+            onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#4CAF50'}
+          >
+            Save Details
+          </button>
+          <button
+            type="button"
+            onClick={handleClear}
+            style={{
+              flex: 1,
+              padding: '12px', 
+              backgroundColor: '#f44336',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontSize: '16px',
+              fontWeight: 'bold',
+              transition: 'background-color 0.3s'
+            }}
+            onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#d32f2f'}
+            onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#f44336'}
+          >
+            Clear Details
+          </button>
+        </div>
       </form>
     </div>
   );
