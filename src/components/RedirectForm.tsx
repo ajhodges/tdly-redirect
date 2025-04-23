@@ -13,12 +13,30 @@ const RedirectForm: React.FC = () => {
     // If 'q' parameter is present, decompress it
     const compressedQuery = searchParams.get('q');
     if (compressedQuery) {
-        // Decode base64url and decompress
-        const bytes = Buffer.from(compressedQuery, 'base64url');
+      try {
+        // Convert base64url to base64
+        const base64 = compressedQuery
+          .replace(/-/g, '+')
+          .replace(/_/g, '/')
+          .padEnd(compressedQuery.length + (4 - (compressedQuery.length % 4)) % 4, '=');
+        
+        // Decode base64 to binary
+        const binaryString = atob(base64);
+        const bytes = new Uint8Array(binaryString.length);
+        for (let i = 0; i < binaryString.length; i++) {
+          bytes[i] = binaryString.charCodeAt(i);
+        }
+        
+        // Decompress using pako
         const decompressed = pako.inflate(bytes);
         const decompressedString = String.fromCharCode.apply(null, Array.from(decompressed));
         console.log('Decompressed query string:', decompressedString);
         return decompressedString;
+      } catch (error) {
+        console.error('Error decompressing query parameters:', error);
+        // If decompression fails, return an empty string to prevent including the compressed 'q' parameter
+        return '';
+      }
     }
     // Otherwise use all parameters except 'q'
     const params = new URLSearchParams(searchParams);

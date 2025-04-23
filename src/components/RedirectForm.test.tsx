@@ -93,7 +93,11 @@ describe('RedirectForm', () => {
       bytes[i] = testString.charCodeAt(i);
     }
     const compressed = pako.gzip(bytes);
-    const base64url = Buffer.from(compressed).toString('base64url');
+    // Convert to base64url without using Buffer
+    const base64url = btoa(String.fromCharCode.apply(null, Array.from(compressed)))
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_')
+      .replace(/=+$/, '');
     
     mockLocalStorage.getItem.mockImplementation((key) => {
       if (key === 'tenderlyUsername') return 'testuser';
