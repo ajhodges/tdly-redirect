@@ -10,7 +10,6 @@ const TestRouter: React.FC = () => (
     <Routes>
       <Route path="/" element={<RedirectForm />} />
       <Route path="/reset" element={<Reset />} />
-      <Route path="/simulator/new" element={<RedirectForm />} />
     </Routes>
   </MemoryRouter>
 );

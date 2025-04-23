@@ -9,7 +9,6 @@ const AppRouter: React.FC = () => {
       <Routes>
         <Route path="/tdly-redirect" element={<RedirectForm />} />
         <Route path="/tdly-redirect/reset" element={<Reset />} />
-        <Route path="/tdly-redirect/simulator/new" element={<RedirectForm />} />
       </Routes>
     </BrowserRouter>
   );
