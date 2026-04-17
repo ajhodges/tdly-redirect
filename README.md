@@ -1,46 +1,49 @@
-# Getting Started with Create React App
+# tdly-redirect
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A lightweight web app that stores your [Tenderly](https://tenderly.co) credentials in the browser and automatically redirects simulation links to your personal dashboard.
 
-## Available Scripts
+## How it works
 
-In the project directory, you can run:
+Tenderly simulation URLs contain your username and project slug, which changes per user. `tdly-redirect` acts as a personal redirect layer: you enter your credentials once, and any simulation link shared through this app will automatically open in your own Tenderly project.
 
-### `npm start`
+Simulation parameters are passed via URL query string. Compressed payloads (gzip + base64url encoded via the `q` parameter) are decompressed client-side before the redirect is built.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+## Usage
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+1. Open the app and enter your Tenderly **username** and **project slug**
+2. Click **Save Details** — credentials are stored in `localStorage`
+3. Any link of the form `https://<your-deployment>/tdly-redirect?<params>` will now redirect automatically
 
-### `npm test`
+### Resetting credentials
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+Navigate to `?path=/reset` to clear stored credentials.
 
-### `npm run build`
+### Finding your credentials
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+| Value | Where to find it |
+|---|---|
+| Username | [Account Settings](https://dashboard.tenderly.co/account/settings) |
+| Project slug | [Projects](https://dashboard.tenderly.co/account/projects) |
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## Development
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+```bash
+npm install
+npm start       # http://localhost:3000
+npm test
+npm run build
+```
 
-### `npm run eject`
+## Deployment
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+The app is configured for GitHub Pages:
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+```bash
+npm run deploy
+```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+This runs a production build and publishes to the `gh-pages` branch.
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+## License
 
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+MIT

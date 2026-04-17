@@ -1,6 +1,9 @@
 {
   "name": "tdly-redirect",
   "version": "0.1.0",
+  "description": "Personal redirect layer for Tenderly simulation links",
+  "author": "Adam Hodges",
+  "license": "MIT",
   "private": true,
   "homepage": "https://ajhodges.github.io/tdly-redirect",
   "dependencies": {
